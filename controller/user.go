@@ -6,6 +6,7 @@ import (
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func UserList(c *fiber.Ctx) error{
@@ -13,12 +14,15 @@ func UserList(c *fiber.Ctx) error{
 		"status": "getUserList",
 	}
 
-record:= new(model.User)
+	record:= []model.User{}
 
-	database.DBConn.Find(&record)
+	err:=database.DBConn.Preload("Posts").Find(&record).Error
 
+	if err !=nil{
+		c.Status(500).JSON(fiber.Map{"err":"tidak dapat mengambil Posts dari database"})
+	}
 	context["data"] = record
-	
+
 	return c.Status(200).JSON(context)
 }
 
@@ -33,6 +37,8 @@ func CreateUser(c *fiber.Ctx) error{
 	if err:= c.BodyParser(&record);err!=nil{
 		log.Printf("Error in parsing Body.")
 	}
+	record.ID = uint(uuid.New().ID())
+	// uuid.New()
 
 	result := database.DBConn.Create(record)
 

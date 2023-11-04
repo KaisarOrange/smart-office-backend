@@ -21,7 +21,8 @@ func ConnectToDatabase(){
 	}
 	log.Println("Koneksi database berhasil!")
 
-	db.AutoMigrate(new(model.User))
+	db.AutoMigrate(new(model.User), new(model.Posts))
 
 	DBConn = db
 }
+
