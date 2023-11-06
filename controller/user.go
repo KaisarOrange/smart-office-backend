@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/KaisarOrange/smart-office/database"
@@ -34,10 +35,12 @@ func CreateUser(c *fiber.Ctx) error{
 
 	record := new(model.User)
 
+	record.Photo_URL = GetUserPicture()
+
 	if err:= c.BodyParser(&record);err!=nil{
 		log.Printf("Error in parsing Body.")
 	}
-	record.ID = uint(uuid.New().ID())
+	record.ID = uuid.New()
 	// uuid.New()
 
 	result := database.DBConn.Create(record)
@@ -52,3 +55,42 @@ func CreateUser(c *fiber.Ctx) error{
 
 	return c.Status(201).JSON(context)
 }
+
+type UserPicture struct{
+	Results []struct{
+		Picture struct {
+			Medium    string `json:"medium"`
+		} `json:"picture"`
+	}
+}
+
+func GetUserPicture() string{
+	
+
+	result :=fiber.Get("https://randomuser.me/api/")
+	result.Set("header-token", "value")
+
+	_, data, err := result.Bytes()
+
+	
+	
+	if err!=nil{
+		log.Fatal(err)
+	}
+
+	var userPicture UserPicture
+
+	Jsonerr := json.Unmarshal(data, &userPicture)
+
+	if Jsonerr !=nil{
+		log.Fatal(Jsonerr)
+	}
+
+    resultReturn := userPicture.Results[0].Picture.Medium
+	
+
+	return resultReturn
+
+}
+
+

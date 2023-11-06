@@ -6,8 +6,8 @@ import (
 )
 
 func Routes(app *fiber.App){
-	app.Get("/", controller.UserList)
-	app.Post("/", controller.CreateUser)
+	app.Get("/users", controller.UserList)
+	app.Post("/users", controller.CreateUser)
 
 	app.Get("/posts", controller.GetPosts)
 	app.Post("/posts", controller.CreatePost)

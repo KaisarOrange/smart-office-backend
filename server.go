@@ -3,9 +3,11 @@ package main
 import (
 	"log"
 
+	"github.com/KaisarOrange/smart-office/controller"
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/router"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -28,8 +30,15 @@ func main() {
 	}
 
 	defer db.Close()
+	
 
 	app := fiber.New()
+
+	controller.GetUserPicture()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
 
 	router.Routes(app)
 

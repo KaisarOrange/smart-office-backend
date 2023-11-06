@@ -6,6 +6,7 @@ import (
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func GetPosts(c *fiber.Ctx) error{
@@ -44,7 +45,7 @@ func CreatePost(c *fiber.Ctx) error{
 	}
 
 
-	if record.UserID == 0 {
+	if record.UserID == uuid.Nil {
 		return c.Status(403).JSON(fiber.Map{
 			"err":"user id not found!",
 		})
