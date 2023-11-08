@@ -12,7 +12,7 @@ type Posts struct {
 	UserID uuid.UUID `json:"user_id" gorm:"not null"`
 	Judul string `json:"judul" gorm:"not null;size:50"`
 	Konten datatypes.JSON `json:"konten" gorm:"type:json"`
-	CreatedAt time.Time `gorm:"not null"`
+	CreatedAt time.Time `json:"created_at" gorm:"not null"`
 }
 
 type PostResponse struct{

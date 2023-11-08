@@ -9,8 +9,8 @@ func Routes(app *fiber.App){
 	app.Get("/users", controller.UserList)
 	app.Post("/users", controller.CreateUser)
 
-	app.Get("/posts", controller.GetPosts)
-	app.Post("/posts", controller.CreatePost)
+	app.Get("api/posts", controller.GetPosts)
+	app.Post("api/posts", controller.CreatePost)
 
 
 }

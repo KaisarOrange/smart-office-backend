@@ -9,7 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
+
+
 func GetPosts(c *fiber.Ctx) error{
+	db := database.DBConn
 
 	context:= fiber.Map{
 		"status": "Get All Post",
@@ -18,7 +21,11 @@ func GetPosts(c *fiber.Ctx) error{
 
 	var posts []model.Posts
 
-	database.DBConn.Find(&posts)
+dbFetchError:=db.Order("created_at desc").Find(&posts).Error
+
+if dbFetchError !=nil{
+	log.Println(dbFetchError.Error())
+}
 	context["data"] = posts 
 
 	return c.Status(201).JSON(context)
@@ -33,8 +40,8 @@ func CreatePost(c *fiber.Ctx) error{
 	record:= new(model.Posts)
 
 	if err:= c.BodyParser(&record); err !=nil{
-		return c.Status(503).JSON(fiber.Map{
-			"err":"failed to handle request",
+		return c.Status(400).JSON(fiber.Map{
+			"err":"request can't be processed, failed to parse response into struct",
 		})
 	}
 
