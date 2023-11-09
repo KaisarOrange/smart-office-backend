@@ -6,11 +6,15 @@ import (
 )
 
 func Routes(app *fiber.App){
-	app.Get("/users", controller.UserList)
-	app.Post("/users", controller.CreateUser)
+	app.Get("api/users", controller.UserList)
+	app.Post("api/users", controller.CreateUser)
 
 	app.Get("api/posts", controller.GetPosts)
 	app.Post("api/posts", controller.CreatePost)
+
+	app.Get("api/ruang", controller.GetRuang)
+	app.Post("api/ruang", controller.CreateRuang)
+
 
 
 }

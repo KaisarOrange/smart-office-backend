@@ -15,14 +15,16 @@ func UserList(c *fiber.Ctx) error{
 		"status": "getUserList",
 	}
 
-	record:= []model.User{}
+	var users []model.UserResponse
 
-	err:=database.DBConn.Preload("Posts").Find(&record).Error
+	
+
+	err:=database.DBConn.Preload("Posts").Preload("Ruang").Find(&users).Error
 
 	if err !=nil{
 		c.Status(500).JSON(fiber.Map{"err":"tidak dapat mengambil Posts dari database"})
 	}
-	context["data"] = record
+	context["data"] = users
 
 	return c.Status(200).JSON(context)
 }
@@ -35,7 +37,7 @@ func CreateUser(c *fiber.Ctx) error{
 
 	record := new(model.User)
 
-	record.Photo_URL = GetUserPicture()
+	record.PhotoURL = GetUserPicture()
 
 	if err:= c.BodyParser(&record);err!=nil{
 		log.Printf("Error in parsing Body.")

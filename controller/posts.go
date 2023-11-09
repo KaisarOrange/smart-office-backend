@@ -21,11 +21,12 @@ func GetPosts(c *fiber.Ctx) error{
 
 	var posts []model.Posts
 
-dbFetchError:=db.Order("created_at desc").Find(&posts).Error
+	dbFetchError:=db.Order("created_at desc").Find(&posts).Error
 
-if dbFetchError !=nil{
-	log.Println(dbFetchError.Error())
-}
+	if dbFetchError !=nil{
+		log.Println(dbFetchError.Error())
+	
+	}
 	context["data"] = posts 
 
 	return c.Status(201).JSON(context)
