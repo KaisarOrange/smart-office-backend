@@ -21,7 +21,7 @@ func GetPosts(c *fiber.Ctx) error{
 
 	var posts []model.Posts
 
-	dbFetchError:=db.Order("created_at desc").Find(&posts).Error
+	dbFetchError:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
 
 	if dbFetchError !=nil{
 		log.Println(dbFetchError.Error())

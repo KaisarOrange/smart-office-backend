@@ -31,9 +31,25 @@ type UserResponse struct{
 	Ruang []RuangRespone `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
 }
 
+
+type UserPostResponse struct{
+	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
+	UserName  string `json:"user_name" gorm:"not null;column:user_name;size:255"`
+	Email     string `json:"email" gorm:"not null;column:email;size:255"`
+	Name      string `json:"name" gorm:"column:name;size:255"`
+	PhotoURL string `json:"photo_url" gorm:"column:photo_url;type:text"`
+}
+
+
+
 func (UserResponse) TableName() string{
 	return "users"
 }
+
+func (UserPostResponse) TableName() string{
+	return "users"
+}
+
 
 
 

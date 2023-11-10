@@ -8,6 +8,8 @@ import (
 func Routes(app *fiber.App){
 	app.Get("api/users", controller.UserList)
 	app.Post("api/users", controller.CreateUser)
+	app.Get("api/user", controller.GetUser)
+
 
 	app.Get("api/posts", controller.GetPosts)
 	app.Post("api/posts", controller.CreatePost)

@@ -21,10 +21,17 @@ type RuangRespone struct{
 
 }
 
-type RuangResponseUser struct{
-
+type RuangPostResponse struct{
+	ID uuid.UUID `json:"-"`
+	Name		string `json:"name" gorm:"not null"`
+	RuangImgURL string `json:"ruang_img_url" gorm:"type:text"`
 }
 
 func (RuangRespone) TableName() string{
+	return "ruangs"
+}
+
+
+func (RuangPostResponse) TableName() string{
 	return "ruangs"
 }

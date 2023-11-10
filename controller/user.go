@@ -8,6 +8,7 @@ import (
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func UserList(c *fiber.Ctx) error{
@@ -26,6 +27,26 @@ func UserList(c *fiber.Ctx) error{
 	}
 	context["data"] = users
 
+	return c.Status(200).JSON(context)
+}
+
+func GetUser(c *fiber.Ctx) error{
+	context:= fiber.Map{
+		"status":"get User",
+	}
+
+	var user model.UserResponse
+
+	err:=database.DBConn.Preload("Posts", func(db *gorm.DB) *gorm.DB{
+		return db.Order("created_at desc")
+	}).Preload("Posts.User").Preload("Posts.Ruang").Preload("Ruang").Order("created_at desc").Find(&user, "id = ?", "b932bb2c-54e7-4f49-8e2f-2cbb3f0b5fed").Error
+
+	if err !=nil{
+		context["err"] = "tidak dapat mengambil user data"
+		c.Status(500).JSON(context)
+	}
+
+	context["data"] = user
 	return c.Status(200).JSON(context)
 }
 
