@@ -14,9 +14,8 @@ func Routes(app *fiber.App){
 	app.Get("api/posts", controller.GetPosts)
 	app.Post("api/posts", controller.CreatePost)
 
-	app.Get("api/ruang", controller.GetRuang)
+	app.Get("api/ruang", controller.GetRuangs)
+	app.Get("api/ruang/:id", controller.GetRuang)
 	app.Post("api/ruang", controller.CreateRuang)
-
-
-
+	app.Put("api/ruangupdate", controller.InsertUserIntoRuang)
 }

@@ -14,7 +14,7 @@ type Posts struct {
 	Judul		string `json:"judul" gorm:"not null;size:50"`
 	Konten		datatypes.JSON `json:"konten" gorm:"type:json"`
 	CreatedAt	time.Time `json:"created_at" gorm:"not null"`
-	User 		UserPostResponse `json:"user" gorm:"preload:true"`
+	User 		UserPostResponse `json:"user" gorm:"foreignKey:user_id;references:id"`
 	Ruang 		RuangPostResponse `json:"ruang" gorm:"foreignKey:ruang_id;references:id"`
 }
 

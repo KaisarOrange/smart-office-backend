@@ -17,8 +17,6 @@ type RuangRespone struct{
 	Posts		[]Posts  `json:"posts" gorm:"foreignKey:ruang_id;references:id"`
 	UserID		uuid.UUID `json:"-" form:"user_id"`
 	Users 		[]UserResponse `gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
-
-
 }
 
 type RuangPostResponse struct{
