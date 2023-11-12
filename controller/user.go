@@ -39,7 +39,7 @@ func GetUser(c *fiber.Ctx) error{
 
 	err:=database.DBConn.Preload("Posts", func(db *gorm.DB) *gorm.DB{
 		return db.Order("created_at desc")
-	}).Preload("Posts.User").Preload("Posts.Ruang").Preload("Ruang").Order("created_at desc").Find(&user, "id = ?", "5687d3ca-e4b4-4db7-a55b-2b4c9ec95556").Error
+	}).Preload("Posts.User").Preload("Posts.Ruang").Preload("Ruang").Order("created_at desc").Find(&user, "id = ?", "1eda295b-dba9-4a0e-ba5f-dc6cedc1ece5").Error
 
 	if err !=nil{
 		context["err"] = "tidak dapat mengambil user data"
