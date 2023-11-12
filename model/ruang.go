@@ -8,6 +8,7 @@ type Ruang struct {
 	RuangImgURL string `json:"ruang_img_url" gorm:"type:text"`
 	Posts		[]Posts  `json:"posts"`
 	UserID		uuid.UUID `json:"user_id" form:"user_id" gorm:"-"`
+	Users 		[]UserResponse `json:"user" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
 }
 
 type RuangRespone struct{
@@ -16,7 +17,7 @@ type RuangRespone struct{
 	RuangImgURL string `json:"ruang_img_url" gorm:"type:text"`
 	Posts		[]Posts  `json:"posts" gorm:"foreignKey:ruang_id;references:id"`
 	UserID		uuid.UUID `json:"-" form:"user_id"`
-	Users 		[]UserResponse `gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
+	Users 		[]UserResponse `json:"user" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
 }
 
 type RuangPostResponse struct{

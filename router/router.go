@@ -13,6 +13,8 @@ func Routes(app *fiber.App){
 
 	app.Get("api/posts", controller.GetPosts)
 	app.Post("api/posts", controller.CreatePost)
+	app.Post("api/posts/private", controller.CreatePost)
+
 
 	app.Get("api/ruang", controller.GetRuangs)
 	app.Get("api/ruang/:id", controller.GetRuang)

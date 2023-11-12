@@ -37,6 +37,25 @@ func CreateRuang(c *fiber.Ctx) error{
 
 	}
 
+	var user model.UserResponse
+
+	err:= database.DBConn.Take(&user, "id = ?", ruang.UserID).Error;if err!=nil{
+		context["err"] = "couldn not processed request"
+		log.Println(err)
+		return c.Status(500).JSON(context)
+	}
+
+	errApp:=database.DBConn.Model(&ruang).Association("Users").Append(&user)
+
+	if errApp !=nil{
+		context["err"] = "couldn not processed request"
+		log.Println(errApp)
+
+		return c.Status(500).JSON(context)
+	}
+
+	
+
 	// anggota:= new(model.Anggota)
 
 	// anggota.RuangID = ruang.ID
@@ -100,13 +119,13 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 	var ruang model.RuangRespone
 	var user model.UserResponse
 
-	err:= database.DBConn.Find(&ruang, "id = ?", "e82f960b-574f-424a-a644-0034af6766a2").Error
+	err:= database.DBConn.Take(&ruang, "id = ?", "afeefecb-cd78-44da-92b5-5fb4e314d705").Error
 	if err !=nil{
 		context["err"] = err
 		log.Println("1")
 		return c.Status(500).JSON(context)
 	}
-	errRuang:= database.DBConn.Find(&user, "id = ?", "aa42f885-4672-4a2c-bb34-12fc35921b11").Error
+	errRuang:= database.DBConn.Take(&user, "id = ?", "1eda295b-dba9-4a0e-ba5f-dc6cedc1ece5").Error
 
 	if errRuang !=nil{
 		context["err"] = err
@@ -127,7 +146,6 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 		return c.Status(500).JSON(context)
 	}
 
-	log.Println(ruang.Users)
 	context["data"] = ruang
 
 	// if err !=nil {

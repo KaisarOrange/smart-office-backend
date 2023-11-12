@@ -43,6 +43,7 @@ func CreatePost(c *fiber.Ctx) error{
 	if err:= c.BodyParser(&record); err !=nil{
 		return c.Status(400).JSON(fiber.Map{
 			"err":"request can't be processed, failed to parse response into struct",
+			"message": err.Error(),
 		})
 	}
 
@@ -63,6 +64,8 @@ func CreatePost(c *fiber.Ctx) error{
 
 	if result.Error != nil{
 		log.Println("Error menyimpan di dalam database")
+		context["err"] = result.Error.Error()
+		return c.Status(400).JSON(context)
 	}
 
 
@@ -71,3 +74,4 @@ func CreatePost(c *fiber.Ctx) error{
 
 	return c.Status(201).JSON(context)
 }
+
