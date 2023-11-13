@@ -27,6 +27,11 @@ func CreateRuang(c *fiber.Ctx) error{
 		return c.Status(403).JSON(context)
 	}
 
+	if ruang.Name == "" {
+		context["err"] = "required name to proceed"
+		return c.Status(403).JSON(context)
+	}
+
 	ruang.ID = uuid.New()
 	
 	result:= database.DBConn.Create(ruang)
@@ -119,13 +124,13 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 	var ruang model.RuangRespone
 	var user model.UserResponse
 
-	err:= database.DBConn.Take(&ruang, "id = ?", "afeefecb-cd78-44da-92b5-5fb4e314d705").Error
+	err:= database.DBConn.Take(&ruang, "id = ?", "3c80abcf-de11-466d-b82f-da09a22064c2").Error
 	if err !=nil{
 		context["err"] = err
 		log.Println("1")
 		return c.Status(500).JSON(context)
 	}
-	errRuang:= database.DBConn.Take(&user, "id = ?", "1eda295b-dba9-4a0e-ba5f-dc6cedc1ece5").Error
+	errRuang:= database.DBConn.Take(&user, "id = ?", "f2650a64-c29d-426f-9882-11fce7471c00").Error
 
 	if errRuang !=nil{
 		context["err"] = err
