@@ -16,8 +16,8 @@ type Posts struct {
 	CreatedAt	time.Time 			`json:"created_at" gorm:"not null"`
 	User 		UserPostResponse 	`json:"user" gorm:"foreignKey:user_id;references:id"`
 	Ruang 		RuangPostResponse 	`json:"ruang" gorm:"foreignKey:ruang_id;references:id"`
-	Draft		bool				`json:"draft" gorm:"default:true"`
-	Private		bool				`json:"private" gorm:"default:true"`					
+	Draft		bool				`json:"draft" gorm:"default:false"`
+	Private		bool				`json:"private" gorm:"default:false"`					
 }
 
 

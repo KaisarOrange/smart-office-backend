@@ -2,11 +2,13 @@ package controller
 
 import (
 	"log"
+	"sort"
 
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 
@@ -19,15 +21,39 @@ func GetPosts(c *fiber.Ctx) error{
 		
 	}
 
-	var posts []model.Posts
+	var ruang []model.RuangRespone
 
-	dbFetchError:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
+	err:=database.DBConn.Take(&ruang).Error
+	
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
+	}
 
-	if dbFetchError !=nil{
-		log.Println(dbFetchError.Error())
+	var user model.UserGetPostAllRuang
+
+	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
+	err = db.Preload("Ruang").Preload("Ruang.Posts", func(db *gorm.DB) *gorm.DB{
+		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.User").Take(&user,"id = ?", c.Params("id")).Error
+
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
 	
 	}
-	context["data"] = posts 
+
+	var posts []model.Posts
+
+	for _, users := range user.Ruang{
+		posts = append(posts, users.Posts...)
+	}
+
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].CreatedAt.After(posts[j].CreatedAt)
+	})
+	context["data"] = posts
 
 	return c.Status(201).JSON(context)
 }
@@ -76,6 +102,8 @@ func CreatePost(c *fiber.Ctx) error{
 		context["err"] = result.Error.Error()
 		return c.Status(400).JSON(context)
 	}
+	log.Println(record.Private)
+	log.Println(record.Draft)
 
 
 	context["data"] = record

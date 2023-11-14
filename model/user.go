@@ -31,6 +31,22 @@ type UserResponse struct{
 	Ruang []RuangRespone `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
 }
 
+//Types for get All post
+type UserGetPostAllRuang struct{
+	ID        uuid.UUID `json:"-" gorm:"primaryKey"`
+	Ruang []RuangUserGetPostAllRuang `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
+}
+
+type RuangUserGetPostAllRuang struct{
+	ID			uuid.UUID `json:"-"`
+	Posts		[]Posts  `json:"posts" gorm:"foreignKey:ruang_id;references:id"`
+}
+
+func (RuangUserGetPostAllRuang) TableName() string{
+	return "ruangs"
+}
+
+//---------------------------------------------------------------------------------//
 
 type UserPostResponse struct{
 	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
@@ -48,6 +64,10 @@ type UserID struct{
 
 
 func (UserResponse) TableName() string{
+	return "users"
+}
+
+func (UserGetPostAllRuang) TableName() string{
 	return "users"
 }
 
