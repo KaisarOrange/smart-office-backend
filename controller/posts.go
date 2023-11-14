@@ -46,6 +46,11 @@ func CreatePost(c *fiber.Ctx) error{
 			"message": err.Error(),
 		})
 	}
+	if record.RuangID == uuid.Nil{
+		return c.Status(400).JSON(fiber.Map{
+			"err":"Ruang belum dipilih!",
+		})
+	}
 
 	if record.Judul == ""{
 		return c.Status(400).JSON(fiber.Map{
@@ -59,6 +64,10 @@ func CreatePost(c *fiber.Ctx) error{
 			"err":"user id not found!",
 		})
 	} 
+
+	if record.Private {
+		record.RuangID = record.UserID
+	}
 		
 	result := database.DBConn.Create(record)
 

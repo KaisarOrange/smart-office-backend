@@ -17,9 +17,24 @@ func CreateRuang(c *fiber.Ctx) error{
 
 	ruang:= new(model.Ruang)
 
-	if err:= c.BodyParser(&ruang);err!=nil{
-		context["err"] = "couldnt not handle request"
-		return c.Status(400).JSON(context)
+	if c.Locals("user") !=nil{
+
+		user := c.Locals("user").(*model.User)
+		ruang.ID = user.ID
+		ruang.UserID = user.ID
+		ruang.Name = user.UserName
+
+	}else{
+		
+		if err:= c.BodyParser(&ruang);err!=nil{
+			context["err"] = err.Error()
+			context["message"] = "couldnt not handle request"
+			log.Println(err.Error())
+
+			return c.Status(403).JSON(context)
+		}
+
+		ruang.ID = uuid.New()
 	}
 
 	if ruang.UserID == uuid.Nil {
@@ -32,41 +47,37 @@ func CreateRuang(c *fiber.Ctx) error{
 		return c.Status(403).JSON(context)
 	}
 
-	ruang.ID = uuid.New()
-	
-	result:= database.DBConn.Create(ruang)
+	err:= database.DBConn.Create(ruang).Error
 
-	if result.Error!=nil{
-		context["err"] = "Gagal menyimpan dalam database"
+	if err!=nil{
+		context["message"] = "Gagal menyimpan dalam database"
+		context["err"] = err.Error()
+		log.Println(err.Error())
+
 		return c.Status(503).JSON(context)
-
 	}
 
 	var user model.UserResponse
 
-	err:= database.DBConn.Take(&user, "id = ?", ruang.UserID).Error;if err!=nil{
-		context["err"] = "couldn not processed request"
-		log.Println(err)
-		return c.Status(500).JSON(context)
-	}
-
-	errApp:=database.DBConn.Model(&ruang).Association("Users").Append(&user)
-
-	if errApp !=nil{
-		context["err"] = "couldn not processed request"
-		log.Println(errApp)
-
-		return c.Status(500).JSON(context)
-	}
-
+	err = database.DBConn.Take(&user, "id = ?", ruang.UserID).Error 
 	
+	if err!=nil{
+		context["err"] = "couldn not processed request"
+		context["message"] = err.Error()
+		log.Println(err.Error())
 
-	// anggota:= new(model.Anggota)
+		return c.Status(500).JSON(context)
+	}
 
-	// anggota.RuangID = ruang.ID
-	// anggota.UserID = ruang.UserID
+	err = database.DBConn.Model(&ruang).Association("Users").Append(&user)
 
-	// database.DBConn.Create(&anggota)
+	if err !=nil{
+		context["err"] = "couldn not processed request"
+		context["message"] = err.Error()
+		log.Println(err.Error())
+
+		return c.Status(500).JSON(context)
+	}
 
 	context["data"] = ruang
 	return c.Status(200).JSON(context)
@@ -106,7 +117,8 @@ func GetRuang(c *fiber.Ctx) error{
 	}).Preload("Posts.Ruang").Preload("Posts.User").Preload("Users").First(&ruang, "id = ?",c.Params("id")).Error
 
 	if err !=nil{
-		context["error_message"] = err;
+		context["error_message"] = err.Error();
+		log.Println(err.Error())
 		return c.Status(503).JSON(context)
 	}
 
@@ -134,29 +146,22 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 
 	if errRuang !=nil{
 		context["err"] = err
-		log.Println("2")
 		return c.Status(500).JSON(context)
 	}
 
-	// var user = &model.User{}
 
-	// err:= database.DBConn.Preload("Users").Take(&ruang,"id = ?", id).Error
+	err =database.DBConn.Model(&ruang).Association("Users").Append(&user)
 
-	errApp:=database.DBConn.Model(&ruang).Association("Users").Append(&user)
+	if err !=nil{
+		context["err"] = err.Error()
+		context["message"] = "couldn not processed request"
 
-	if errApp !=nil{
-		context["err"] = "couldn not processed request"
-		log.Println(errApp)
+		log.Println(err.Error())
 
 		return c.Status(500).JSON(context)
 	}
 
 	context["data"] = ruang
-
-	// if err !=nil {
-	// 	context["err"] = err
-	// 	return c.Status(500).JSON(context)
-	// }
 
 	return c.Status(200).JSON(context);
 	

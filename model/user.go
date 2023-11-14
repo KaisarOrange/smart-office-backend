@@ -41,6 +41,11 @@ type UserPostResponse struct{
 }
 
 
+type UserID struct{
+	ID uuid.UUID
+}
+
+
 
 func (UserResponse) TableName() string{
 	return "users"
