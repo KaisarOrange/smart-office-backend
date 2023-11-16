@@ -20,7 +20,6 @@ type Posts struct {
 	Private		bool				`json:"private" gorm:"default:false"`					
 }
 
-
 type PostResponse struct{
 	ID   uint `json:"id"`
 	UserID uuid.UUID `json:"-"`

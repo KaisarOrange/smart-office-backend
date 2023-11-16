@@ -112,7 +112,7 @@ func GetRuang(c *fiber.Ctx) error{
 
  	var ruang model.RuangRespone
 
-	err:= database.DBConn.Preload("Posts", func(db *gorm.DB) *gorm.DB{
+	err:= database.DBConn.Preload("Posts" ,"draft <> true AND private <> true", func(db *gorm.DB) *gorm.DB{
 		return db.Order("created_at desc")
 	}).Preload("Posts.Ruang").Preload("Posts.User").Preload("Users").First(&ruang, "id = ?",c.Params("id")).Error
 
@@ -139,7 +139,6 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 	err:= database.DBConn.Take(&ruang, "id = ?", "3c80abcf-de11-466d-b82f-da09a22064c2").Error
 	if err !=nil{
 		context["err"] = err
-		log.Println("1")
 		return c.Status(500).JSON(context)
 	}
 	errRuang:= database.DBConn.Take(&user, "id = ?", "f2650a64-c29d-426f-9882-11fce7471c00").Error
