@@ -8,6 +8,7 @@ import (
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -157,35 +158,41 @@ func CreatePost(c *fiber.Ctx) error{
 	context["data"] = record
 	context["message"] = "buat post baru sukses"
 
-	return c.Status(201).JSON(context)
+	c.Locals("posts", record)
+
+	return c.Next()
 }
 
 func CreateComment(c *fiber.Ctx) error{
-
 	context := fiber.Map{"message":"create comment"}
-
 	comment := new(model.Comment)
-	commentResult := new(model.Comment)
 
-	err:= c.BodyParser(&comment)
+	// var commentText = []model.CommentText{}
 
-	commentResult.Comments = comment.Comments
+	if c.Locals("posts") !=nil{
+		post:= c.Locals("posts").(*model.Posts)
+		comment.PostsID = post.ID
+		// comment.Comments = commentText
+		comment.Comments = datatypes.JSON([]byte(`[]`))
 
-	if err != nil{
-		context["err"] = err.Error()
-		log.Println(err.Error())
-		return c.Status(503).JSON(context)
+	}else{
+		if err:= c.BodyParser(&comment);err!=nil{
+			context["err"] = err.Error()
+			context["message"] = "couldnt not handle request"
+			log.Println(err.Error())
+
+			return c.Status(403).JSON(context)
+		}
+		// err := database.DBConn.Select("").First(&comment, "comments.posts_id = ?",comment.PostsID).Error
+		// if err != nil{
+		// 	context["err"] = err.Error()
+		// 	log.Println(err.Error())
+		// 	return c.Status(503).JSON(context)
+		// }
 	}
 
-	err = database.DBConn.First(&comment, "comments.posts_id = ?",comment.PostsID).Error
-
-	if err != nil{
-		context["err"] = err.Error()
-		log.Println(err.Error())
-		return c.Status(503).JSON(context)
-	}
-
-
+	// commentResult := new(model.Comment)
+	// commentResult.Comments = comment.Comments
 
 	if comment.PostsID == 0{
 		return c.Status(403).JSON(fiber.Map{
@@ -193,23 +200,30 @@ func CreateComment(c *fiber.Ctx) error{
 		})
 	}
 
-
-	if err != nil{
-		context["err"]= err.Error()
-		log.Println(err.Error())
-		return c.Status(503).JSON(context)
-	}
-
-	comment.Comments = commentResult.Comments
+	// comment.Comments = commentResult.Comments
+	// commentGo := []model.CommentText{{UserName: "Alif Boyke", UserImage: "https://source.unsplash.com/hr7eefjrekI",
+	//  Text: "Ini golang canggih dan rumit", Like: 25, Comments: &[]model.CommentText{{UserName: "Nurdin", UserImage: "https://source.unsplash.com/hr7eefjrekI", Text: "good game!", Like: 3, Comments: &[]model.CommentText{}}}}}
 	
-	err = database.DBConn.Save(&comment).Error
+	
+	//  comment = &model.Comment{
+	// 	PostsID: 15,
+	// 	Comments: datatypes.JSON(comment.Comments),
+		
+	// 	// Comments: datatypes.NewJSONSlice(commentGo),
+
+	// }	  
+
+	// comment.Comments = datatypes.JSON(comment.Comments)
+
+	err := database.DBConn.Model(&comment).Where("posts_id = ?", comment.PostsID).Update("comments", comment.Comments).Error
 
 	if err!=nil{
 		context["err"]= err.Error()
 		log.Println(err.Error())
 		return c.Status(503).JSON(context)
 	}
-	context["data"] = &comment
+
+	context["data"] = comment
 	return c.Status(201).JSON(context)
 }
 

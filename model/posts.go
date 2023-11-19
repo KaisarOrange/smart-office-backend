@@ -18,7 +18,7 @@ type Posts struct {
 	Ruang 		RuangPostResponse 	`json:"ruang" gorm:"foreignKey:ruang_id;references:id"`
 	Draft		bool				`json:"draft" gorm:"default:false"`
 	Private		bool				`json:"private" gorm:"default:false"`		
-	Comment 	Comment				`json:"comment" gorm:"default:null"` 
+	Comment 	Comment				`json:"comment"` 
 }
 
 type PostResponse struct{
@@ -37,7 +37,17 @@ func (PostResponse) TableName() string{
 //Comments
 
 type Comment struct {
-	ID			uint			`json:"id" gorm:"not null"`
-	PostsID		uint			`json:"posts_id"`
-	Comments	datatypes.JSON	`json:"comments"`
+	ID			uint								`json:"id" gorm:"not null"`
+	PostsID		uint								`json:"posts_id"`
+	Comments	datatypes.JSON						`json:"comments"`
+	// Comments	datatypes.JSONSlice[CommentText]	`json:"comments" gorm:"type:json[]"`
+
 }
+
+// type CommentText struct{
+// 	UserName string `json:"user_name"`
+// 	UserImage string `json:"user_img"`
+// 	Text      string `json:"text"`
+// 	Comments *[]CommentText `json:"comments"`
+// 	Like	uint `json:"like"`
+// }

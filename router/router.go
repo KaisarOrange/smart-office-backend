@@ -13,7 +13,7 @@ func Routes(app *fiber.App){
 
 	app.Get("api/posts/:id", controller.GetPosts)
 	app.Get("api/posts/:id/draft", controller.GetPostsDraft)
-	app.Post("api/posts", controller.CreatePost)
+	app.Post("api/posts", controller.CreatePost, controller.CreateComment)
 	app.Post("api/posts/private", controller.CreatePost)
 	app.Post("api/posts/comment", controller.CreateComment)
 	
