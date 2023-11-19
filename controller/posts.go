@@ -35,7 +35,7 @@ func GetPosts(c *fiber.Ctx) error{
 
 	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
 	err = db.Preload("Ruang").Preload("Ruang.Posts","private <> true AND draft <> true", func(db *gorm.DB) *gorm.DB{
-		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.User").Take(&user,"id = ?", c.Params("id")).Error
+		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.Comment").Preload("Ruang.Posts.User").Take(&user,"id = ?", c.Params("id")).Error
 
 	
 	if err !=nil{
@@ -165,14 +165,27 @@ func CreateComment(c *fiber.Ctx) error{
 	context := fiber.Map{"message":"create comment"}
 
 	comment := new(model.Comment)
+	commentResult := new(model.Comment)
 
 	err:= c.BodyParser(&comment)
 
-	if comment.UserID == uuid.Nil {
-		return c.Status(403).JSON(fiber.Map{
-			"err":"user id not found!",
-		})
+	commentResult.Comments = comment.Comments
+
+	if err != nil{
+		context["err"] = err.Error()
+		log.Println(err.Error())
+		return c.Status(503).JSON(context)
 	}
+
+	err = database.DBConn.First(&comment, "comments.posts_id = ?",comment.PostsID).Error
+
+	if err != nil{
+		context["err"] = err.Error()
+		log.Println(err.Error())
+		return c.Status(503).JSON(context)
+	}
+
+
 
 	if comment.PostsID == 0{
 		return c.Status(403).JSON(fiber.Map{
@@ -180,13 +193,16 @@ func CreateComment(c *fiber.Ctx) error{
 		})
 	}
 
+
 	if err != nil{
 		context["err"]= err.Error()
 		log.Println(err.Error())
 		return c.Status(503).JSON(context)
 	}
+
+	comment.Comments = commentResult.Comments
 	
-	err = database.DBConn.Create(&comment).Error
+	err = database.DBConn.Save(&comment).Error
 
 	if err!=nil{
 		context["err"]= err.Error()

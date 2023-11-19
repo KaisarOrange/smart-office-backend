@@ -16,7 +16,6 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" gorm:"not null"`
 	Posts []Posts `json:"posts"`
 	Ruang []Ruang `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
-	Comments []Comment `json:"comment"`
 }
 
 
