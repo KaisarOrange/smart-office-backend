@@ -175,6 +175,8 @@ func CreateComment(c *fiber.Ctx) error{
 		// comment.Comments = commentText
 		comment.Comments = datatypes.JSON([]byte(`[]`))
 
+		database.DBConn.Create(&comment)
+
 	}else{
 		if err:= c.BodyParser(&comment);err!=nil{
 			context["err"] = err.Error()
@@ -189,16 +191,19 @@ func CreateComment(c *fiber.Ctx) error{
 		// 	log.Println(err.Error())
 		// 	return c.Status(503).JSON(context)
 		// }
+
+			
+		err := database.DBConn.Model(&comment).Where("posts_id = ?", comment.PostsID).Update("comments", comment.Comments).Error
+
+		if err!=nil{
+			context["err"]= err.Error()
+			log.Println(err.Error())
+			return c.Status(503).JSON(context)
+		}
 	}
 
 	// commentResult := new(model.Comment)
 	// commentResult.Comments = comment.Comments
-
-	if comment.PostsID == 0{
-		return c.Status(403).JSON(fiber.Map{
-			"err":"post id not found!",
-		})
-	}
 
 	// comment.Comments = commentResult.Comments
 	// commentGo := []model.CommentText{{UserName: "Alif Boyke", UserImage: "https://source.unsplash.com/hr7eefjrekI",
@@ -215,13 +220,6 @@ func CreateComment(c *fiber.Ctx) error{
 
 	// comment.Comments = datatypes.JSON(comment.Comments)
 
-	err := database.DBConn.Model(&comment).Where("posts_id = ?", comment.PostsID).Update("comments", comment.Comments).Error
-
-	if err!=nil{
-		context["err"]= err.Error()
-		log.Println(err.Error())
-		return c.Status(503).JSON(context)
-	}
 
 	context["data"] = comment
 	return c.Status(201).JSON(context)
