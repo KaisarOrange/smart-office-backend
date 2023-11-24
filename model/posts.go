@@ -18,7 +18,7 @@ type Posts struct {
 	Ruang 		RuangPostResponse 	`json:"ruang" gorm:"foreignKey:ruang_id;references:id"`
 	Draft		bool				`json:"draft" gorm:"default:false"`
 	Private		bool				`json:"private" gorm:"default:false"`		
-	Comment 	Comment				`json:"comment"` 
+	Comment 	Comment				`json:"comment" gorm:"constraint:OnDelete:CASCADE"` 
 }
 
 type PostResponse struct{

@@ -163,6 +163,30 @@ func CreatePost(c *fiber.Ctx) error{
 	return c.Next()
 }
 
+func UpdatePost(c *fiber.Ctx) error{
+	context := fiber.Map{"message":"UpdatePost"}
+
+	post := new(model.Posts)
+
+	err:=c.BodyParser(&post)
+
+	if err != nil{
+		context["err"] = err.Error()
+		return c.Status(503).JSON(context)
+	}
+
+	err = database.DBConn.Model(&post).Where("id = ?", post.ID).Update("konten", post.Konten).Error
+
+	if err!=nil{
+		context["err"] = err.Error()
+		return c.Status(503).JSON(context)
+	}
+
+	context["data"] = post
+
+	return c.Status(200).JSON(context)
+}
+
 func CreateComment(c *fiber.Ctx) error{
 	context := fiber.Map{"message":"create comment"}
 	comment := new(model.Comment)
@@ -223,5 +247,44 @@ func CreateComment(c *fiber.Ctx) error{
 
 	context["data"] = comment
 	return c.Status(201).JSON(context)
+}
+
+func DeletePost(c *fiber.Ctx) error{
+	context:= fiber.Map{
+		"message":"delete Post",
+	}
+
+	post:= new(model.Posts)
+ 
+	err:= database.DBConn.First(&post, "id = ?", c.Params("id")).Error
+
+	if err != nil{
+		context["err"] = err.Error()
+		c.Status(503).JSON(context)
+		log.Println(err.Error(), "1")
+	}
+
+	// comment := model.Comment{}
+
+	// err = database.DBConn.First(&comment, "posts_id = ?", c.Params("id")).Error
+
+	// if err !=nil{
+	// 	if err != nil{
+	// 		context["err"] = err.Error()
+	// 		log.Println(err.Error(), "2")
+	// 		c.Status(503).JSON(context)
+	// 	}	
+	// }
+
+	// err = database.DBConn.Unscoped().Model(&post).Association("Comment").Unscoped().Clear()
+ 
+	err = database.DBConn.Select("Comment").Delete(&post).Error
+	if err != nil{
+		context["err"] = err.Error()
+		log.Println(err.Error(), "3")
+
+		c.Status(503).JSON(context)
+	}
+	return c.Status(200).JSON(context)
 }
 
