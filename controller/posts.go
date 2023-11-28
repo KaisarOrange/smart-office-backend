@@ -36,7 +36,7 @@ func GetPosts(c *fiber.Ctx) error{
 
 	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
 	err = db.Preload("Ruang").Preload("Ruang.Posts","private <> true AND draft <> true", func(db *gorm.DB) *gorm.DB{
-		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.Comment").Preload("Ruang.Posts.User").Take(&user,"id = ?", c.Params("id")).Error
+		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.Comment").Preload("Ruang.Posts.User").Preload("Ruang.Posts.LikedByUser","id = ?", c.Params("id")).Take(&user,"id = ?", c.Params("id")).Error
 
 	
 	if err !=nil{
@@ -103,7 +103,7 @@ func GetPostsDraft(c *fiber.Ctx) error{
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].CreatedAt.After(posts[j].CreatedAt)
 	})
-	context["data"] = &posts
+	context["data"] = posts
 
 	return c.Status(201).JSON(context)
 }
@@ -288,3 +288,121 @@ func DeletePost(c *fiber.Ctx) error{
 	return c.Status(200).JSON(context)
 }
 
+func LikePosts(c *fiber.Ctx) error{
+	context:= fiber.Map{"status":"like post"}
+
+	user := model.User{}
+	post := model.Posts{}
+
+	type postIdUserId struct{
+		ID uint
+		UserID uuid.UUID `json:"user_id"`
+		PostID uint `json:"posts_id"`
+
+	}
+
+	ids := postIdUserId{}
+
+	err:= c.BodyParser(&ids)
+	
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	err = database.DBConn.Take(&post, "id = ?", ids.PostID).Error
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	err = database.DBConn.Model(&post).Association("LikedByUser").Find(&user, "id = ?", ids.UserID)
+
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	if user.ID != uuid.Nil{
+	
+		err = database.DBConn.Take(&user, "id = ?", ids.UserID).Error
+
+		if err != nil{
+			context["err"]= err.Error()
+			log.Println(err.Error())
+			c.Status(503).JSON(context)
+		}
+	
+		err = database.DBConn.Model(&post).Association("LikedByUser").Delete(&user)
+	
+		if err != nil{
+			context["err"]= err.Error()
+			log.Println(err.Error())
+			c.Status(503).JSON(context)
+		}
+	
+	
+	
+		context["result ganteng"] = user
+	
+		return c.Status(200).JSON(context)
+	}
+
+	err = database.DBConn.Take(&user, "id = ?",ids.UserID).Error
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	err = database.DBConn.Take(&post, "id = ?",ids.PostID).Error
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	err = database.DBConn.Model(&post).Association("LikedByUser").Append(&user)
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+
+
+	// context["data"] = post
+	context["user"] = user
+
+	return c.Status(200).JSON(context)
+}
+
+
+func GetPostLikeCount(c *fiber.Ctx) error{
+	context:= fiber.Map{
+		"status" :"Get Post Likes Count",
+	}
+
+	var count int64 
+
+	err := database.DBConn.Table("user_like_posts").Where("posts_id = ?", c.Params("id")).Count(&count).Error
+	
+	
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+
+	context["like_count"] = count
+
+	return c.Status(200).JSON(context)
+}

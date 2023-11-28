@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/KaisarOrange/smart-office/controller"
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/router"
 	"github.com/gofiber/fiber/v2"
@@ -34,7 +33,7 @@ func main() {
 
 	app := fiber.New()
 
-	controller.GetUserPicture()
+	// controller.GetUserPicture()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",

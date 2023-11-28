@@ -18,9 +18,11 @@ func Routes(app *fiber.App){
 	app.Put("api/posts", controller.UpdatePost)
 	app.Delete("api/posts/delete/:id", controller.DeletePost)
 
-	app.Post("api/posts/comment", controller.CreateComment)
-	
+	app.Put("api/posts/like", controller.LikePosts)
+	app.Get("api/posts/like/:id", controller.GetPostLikeCount)
 
+
+	app.Put("api/posts/comment", controller.CreateComment)
 
 	app.Get("api/ruang", controller.GetRuangs)
 	app.Get("api/ruang/:id", controller.GetRuang)

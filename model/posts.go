@@ -19,6 +19,7 @@ type Posts struct {
 	Draft		bool				`json:"draft" gorm:"default:false"`
 	Private		bool				`json:"private" gorm:"default:false"`		
 	Comment 	Comment				`json:"comment" gorm:"constraint:OnDelete:CASCADE"` 
+	LikedByUser []User				`json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:posts_id;references:id;joinReferences:user_id"`						  
 }
 
 type PostResponse struct{
@@ -27,7 +28,8 @@ type PostResponse struct{
 	RuangID uuid.UUID `json:"-"`
 	Judul string `json:"judul"`
 	Konten string `json:"konten"`
-	CreatedAt time.Time 
+	CreatedAt time.Time
+	LikedByUser []User				`json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:posts_id;references:id;joinReferences:user_id"`						  
 }
 
 func (PostResponse) TableName() string{
@@ -37,7 +39,6 @@ func (PostResponse) TableName() string{
 //Comments
 
 type Comment struct {
-	ID			uint								`json:"id" gorm:"not null"`
 	PostsID		uint								`json:"posts_id"`
 	Comments	datatypes.JSON						`json:"comments"`
 	// Comments	datatypes.JSONSlice[CommentText]	`json:"comments" gorm:"type:json[]"`
@@ -51,3 +52,6 @@ type Comment struct {
 // 	Comments *[]CommentText `json:"comments"`
 // 	Like	uint `json:"like"`
 // }
+
+
+//Liked
