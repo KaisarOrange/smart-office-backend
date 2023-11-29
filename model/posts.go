@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 type Posts struct {
@@ -29,7 +30,7 @@ type PostResponse struct{
 	Judul string `json:"judul"`
 	Konten string `json:"konten"`
 	CreatedAt time.Time
-	LikedByUser []User				`json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:posts_id;references:id;joinReferences:user_id"`						  
+	LikedByUser []User `json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:posts_id;references:id;joinReferences:user_id"`						  
 }
 
 func (PostResponse) TableName() string{
@@ -39,6 +40,7 @@ func (PostResponse) TableName() string{
 //Comments
 
 type Comment struct {
+	gorm.Model
 	PostsID		uint								`json:"posts_id"`
 	Comments	datatypes.JSON						`json:"comments"`
 	// Comments	datatypes.JSONSlice[CommentText]	`json:"comments" gorm:"type:json[]"`

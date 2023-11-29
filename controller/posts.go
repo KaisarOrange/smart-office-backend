@@ -319,12 +319,16 @@ func LikePosts(c *fiber.Ctx) error{
 		c.Status(503).JSON(context)
 	}
 
+
 	err = database.DBConn.Model(&post).Association("LikedByUser").Find(&user, "id = ?", ids.UserID)
 
 
+
+	
+
 	if err != nil{
 		context["err"]= err.Error()
-		log.Println(err.Error())
+		log.Println("hehe: ", err.Error())
 		c.Status(503).JSON(context)
 	}
 
@@ -349,7 +353,7 @@ func LikePosts(c *fiber.Ctx) error{
 	
 	
 		context["result ganteng"] = user
-	
+	log.Println("ganteng")
 		return c.Status(200).JSON(context)
 	}
 
@@ -368,7 +372,6 @@ func LikePosts(c *fiber.Ctx) error{
 		log.Println(err.Error())
 		c.Status(503).JSON(context)
 	}
-
 	err = database.DBConn.Model(&post).Association("LikedByUser").Append(&user)
 
 	if err != nil{
@@ -376,8 +379,6 @@ func LikePosts(c *fiber.Ctx) error{
 		log.Println(err.Error())
 		c.Status(503).JSON(context)
 	}
-
-
 
 	// context["data"] = post
 	context["user"] = user
