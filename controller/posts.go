@@ -83,7 +83,7 @@ func GetPostsDraft(c *fiber.Ctx) error{
 
 	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
 	err = db.Preload("Ruang").Preload("Ruang.Posts.Comment").Preload("Ruang.Posts","draft = true", func(db *gorm.DB) *gorm.DB{
-		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.User").Take(&user,"id = ?", c.Params("id")).Error
+		return db.Order("created_at desc")}).Preload("Ruang.Posts.Ruang").Preload("Ruang.Posts.User").Preload("Ruang.Posts.LikedByUser").Take(&user,"id = ?", c.Params("id")).Error
 
 	
 	if err !=nil{
