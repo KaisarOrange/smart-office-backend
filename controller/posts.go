@@ -56,7 +56,7 @@ func GetPosts(c *fiber.Ctx) error{
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].CreatedAt.After(posts[j].CreatedAt)
 	})
-	context["data"] = &posts
+	context["data"] = posts
 
 	return c.Status(201).JSON(context)
 }
@@ -278,7 +278,7 @@ func DeletePost(c *fiber.Ctx) error{
 
 	// err = database.DBConn.Unscoped().Model(&post).Association("Comment").Unscoped().Clear()
  
-	err = database.DBConn.Select("Comment").Delete(&post).Error
+	err = database.DBConn.Select("Comment","LikedByUser").Delete(&post).Error
 	if err != nil{
 		context["err"] = err.Error()
 		log.Println(err.Error(), "3")
@@ -406,4 +406,38 @@ func GetPostLikeCount(c *fiber.Ctx) error{
 	context["like_count"] = count
 
 	return c.Status(200).JSON(context)
+}
+
+func GetLikePosts(c *fiber.Ctx) error{
+	db := database.DBConn
+
+	context:= fiber.Map{
+		"status": "Get All Post",
+		
+	}
+
+	var user model.UserGetLikePost
+
+	err:=db.Take(&user).Error
+	
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
+	}
+
+	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
+	err = db.Preload("LikePosts").Preload("LikePosts.Comment").Preload("LikePosts.LikedByUser").Preload("LikePosts.Ruang").Preload("LikePosts.User").Take(&user,"id = ?", c.Params("id")).Error
+
+	
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
+	
+	}
+
+	context["data"] = user
+
+	return c.Status(201).JSON(context)
 }

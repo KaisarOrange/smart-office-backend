@@ -52,6 +52,14 @@ func (RuangUserGetPostAllRuang) TableName() string{
 
 //---------------------------------------------------------------------------------//
 
+type UserGetLikePost struct{
+	ID        uuid.UUID `json:"-" gorm:"primaryKey"`
+	LikePosts	[]Posts `json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:posts_id"`
+}
+
+
+//----//
+
 type UserPostResponse struct{
 	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
 	UserName  string `json:"user_name" gorm:"not null;column:user_name;size:255"`
@@ -68,6 +76,10 @@ type UserID struct{
 
 
 func (UserResponse) TableName() string{
+	return "users"
+}
+
+func (UserGetLikePost) TableName() string{
 	return "users"
 }
 

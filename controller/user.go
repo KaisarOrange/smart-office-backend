@@ -71,7 +71,17 @@ func CreateUser(c *fiber.Ctx) error{
 		log.Printf("Error in parsing Body.")
 	}
 	record.ID = uuid.New()
-	// uuid.New()
+
+	hash, err:= HashPassword(record.Password)
+
+	record.Password = hash
+	if err != nil{
+		log.Println(err.Error())
+
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message":"internal server error",
+		})
+	}
 
 	result := database.DBConn.Create(record)
 

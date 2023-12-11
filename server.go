@@ -32,15 +32,17 @@ func main() {
 	
 
 	app := fiber.New()
+	
 
-	// controller.GetUserPicture()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders:  "Origin, Content-Type, Accept",
 	}))
 
+
+
 	router.Routes(app)
-	// log.Fatal(app.ListenTLS(":443", "./127.0.0.1.pem", "./127.0.0.1-key.pem"))
-	app.Listen("localhost:8080")
+	// log.Fatal(app.ListenTLS("192.168.100.35:8080", "./127.0.0.1.pem", "./127.0.0.1-key.pem"))
+	app.Listen("192.168.100.35:8080")
 }

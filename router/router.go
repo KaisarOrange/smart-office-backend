@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/KaisarOrange/smart-office/controller"
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,6 +14,7 @@ func Routes(app *fiber.App){
 
 	app.Get("api/posts/:id", controller.GetPosts)
 	app.Get("api/posts/:id/draft", controller.GetPostsDraft)
+	app.Get("api/posts/:id/like", controller.GetLikePosts)
 	app.Post("api/posts", controller.CreatePost, controller.CreateComment)
 	app.Post("api/posts/private", controller.CreatePost)
 	app.Put("api/posts", controller.UpdatePost)
@@ -28,4 +30,15 @@ func Routes(app *fiber.App){
 	app.Get("api/ruang/:id", controller.GetRuang)
 	app.Post("api/ruang", controller.CreateRuang)
 	app.Put("api/ruangupdate", controller.InsertUserIntoRuang)
+
+
+	app.Get("api/auth/restricted", jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte("rahasia")},	
+	}),controller.Restricted)
+	app.Post("api/auth/login", controller.Login)
+
+
+
 }
+
+
