@@ -7,6 +7,7 @@ import (
 	"github.com/KaisarOrange/smart-office/router"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -33,12 +34,16 @@ func main() {
 
 	app := fiber.New()
 	
+	app.Use(logger.New())
+
 
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders:  "Origin, Content-Type, Accept",
+		AllowOrigins: "http://192.168.100.35:5173, http://localhost:5173",
+		AllowHeaders:  "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials:true,
 	}))
+
 
 
 

@@ -22,6 +22,9 @@ type UserLoginRequest struct{
 
 func Restricted(c *fiber.Ctx) error {
 
+	
+
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status":"Restricted"})
 }
 
@@ -50,7 +53,7 @@ func Login(c *fiber.Ctx) error{
 
 	if err !=nil{
 		log.Println(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"err": err.Error()})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"err": err.Error()})
 	}
 
 	isUserValid := CheckHashPassword(userLoginInfo.Password, user.Password)
@@ -62,8 +65,8 @@ func Login(c *fiber.Ctx) error{
 
 	claims := jwt.MapClaims{
 		"user_name": user.UserName,
-		"exp": time.Now().Add(time.Second * 30).Unix(),
-
+		"user_id":user.ID,
+		"exp": time.Now().Add(time.Minute * 10).Unix(),
 	}
 
 	token:= jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -73,6 +76,14 @@ func Login(c *fiber.Ctx) error{
 	if err!=nil{
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}
+
+	// cookie := fiber.Cookie{
+    //     Name: "token",
+    //     Value: signedToken,
+    //     HTTPOnly: true,
+    // }
+
+	// 	c.Cookie(&cookie)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": signedToken})
 }

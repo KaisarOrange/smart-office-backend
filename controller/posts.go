@@ -418,18 +418,18 @@ func GetLikePosts(c *fiber.Ctx) error{
 
 	var user model.UserGetLikePost
 
-	err:=db.Take(&user).Error
+	// err:=db.Take(&user).Error
 	
-	if err !=nil{
-		log.Println(err.Error())
-		context["err"]= err.Error()
-		c.Status(503).JSON(context)
-	}
+	// if err !=nil{
+	// 	log.Println(err.Error())
+	// 	context["err"]= err.Error()
+	// 	c.Status(503).JSON(context)
+	// }
 
 	// err:=db.Preload("User").Preload("Ruang").Order("created_at desc").Find(&posts).Error
-	err = db.Preload("LikePosts").Preload("LikePosts.Comment").Preload("LikePosts.LikedByUser").Preload("LikePosts.Ruang").Preload("LikePosts.User").Take(&user,"id = ?", c.Params("id")).Error
+	err := db.Preload("LikePosts").Preload("LikePosts.Comment").Preload("LikePosts.LikedByUser").Preload("LikePosts.Ruang").Preload("LikePosts.User").Take(&user,"id = ?", c.Params("id")).Error
 
-	
+	log.Println("params: ", c.Params("id"))
 	if err !=nil{
 		log.Println(err.Error())
 		context["err"]= err.Error()

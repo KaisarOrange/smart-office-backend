@@ -3,10 +3,12 @@ package controller
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/model"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -50,6 +52,26 @@ func GetUser(c *fiber.Ctx) error{
 	return c.Status(200).JSON(context)
 }
 
+func GetLoggedInUserInfo(c *fiber.Ctx) error{
+	context:= fiber.Map{
+		"status":"get User",
+	}
+
+	var user model.UserResponse
+
+	err:=database.DBConn.Find(&user, "id = ?", c.Params("id")).Error
+
+	if err !=nil{
+		context["err"] = "tidak dapat mengambil user data"
+		c.Status(500).JSON(context)
+	}
+
+	context["data"] = user
+	return c.Status(200).JSON(context)
+}
+
+
+
 func Testo(c *fiber.Ctx) error{
 
 	return c.Status(200).JSON(fiber.Map{
@@ -57,11 +79,14 @@ func Testo(c *fiber.Ctx) error{
 	})
 }
 
+type UserResponseToken struct{
+	Username string
+	ID       uuid.UUID
+	Token 	string
+}
 
 func CreateUser(c *fiber.Ctx) error{
-	context:= fiber.Map{
-		"status":"creating new user.",
-	}
+	
 
 	record := new(model.User)
 
@@ -89,12 +114,30 @@ func CreateUser(c *fiber.Ctx) error{
 		log.Println("Error menyimpan di dalam database")
 	}
 
+	claims := jwt.MapClaims{
+		"user_name": record.UserName,
+		"user_id":record.ID,
+		"exp": time.Now().Add(time.Minute * 10).Unix(),
+	}
+
+	token:= jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	signedToken, err := token.SignedString([]byte("rahasia"))
+
+	if err!=nil{
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+
+	returnedUserInfo := UserResponseToken{
+		Username: record.UserName,
+		ID: record.ID,
+		Token: signedToken,
+	}
 
 
-	context["data"] = record
-	context["message"] = "buat user baru sukses"
+	log.Println("return user: ",returnedUserInfo)
 	
-	c.Locals("user", record)
+	c.Locals("user", returnedUserInfo)
 
 	return c.Next()
 }

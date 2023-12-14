@@ -17,12 +17,18 @@ func CreateRuang(c *fiber.Ctx) error{
 
 	ruang:= new(model.Ruang)
 
+	userJWT := UserResponseToken{}
+
+
 	if c.Locals("user") !=nil{
 
-		user := c.Locals("user").(*model.User)
+		user := c.Locals("user").(UserResponseToken)
 		ruang.ID = user.ID
 		ruang.UserID = user.ID
-		ruang.Name = user.UserName
+		ruang.Name = user.Username
+		userJWT.ID = user.ID
+		userJWT.Token = user.Token
+		userJWT.Username = user.Username
 
 	}else{
 		
@@ -80,6 +86,7 @@ func CreateRuang(c *fiber.Ctx) error{
 	}
 
 	context["data"] = ruang
+	context["token"] = userJWT.Token
 	return c.Status(200).JSON(context)
 
 }
@@ -141,7 +148,7 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 		context["err"] = err
 		return c.Status(500).JSON(context)
 	}
-	errRuang:= database.DBConn.Take(&user, "id = ?", "e249c025-0547-496f-ad55-be974786c23c").Error
+	errRuang:= database.DBConn.Take(&user, "id = ?", "ec69e8d7-9ed6-4032-a42a-f5c0f1e917c4").Error
 
 	if errRuang !=nil{
 		context["err"] = err

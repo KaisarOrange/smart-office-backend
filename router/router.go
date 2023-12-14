@@ -10,6 +10,8 @@ func Routes(app *fiber.App){
 	app.Get("api/users", controller.UserList)
 	app.Post("api/users", controller.CreateUser, controller.CreateRuang)
 	app.Get("api/user/:id", controller.GetUser)
+	app.Get("api/user/login/:id", controller.GetLoggedInUserInfo)
+
 
 
 	app.Get("api/posts/:id", controller.GetPosts)
