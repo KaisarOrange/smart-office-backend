@@ -48,6 +48,10 @@ func GetUser(c *fiber.Ctx) error{
 		c.Status(500).JSON(context)
 	}
 
+
+
+
+
 	context["data"] = user
 	return c.Status(200).JSON(context)
 }

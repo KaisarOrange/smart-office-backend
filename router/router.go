@@ -40,6 +40,17 @@ func Routes(app *fiber.App){
 	app.Post("api/auth/login", controller.Login)
 
 
+	app.Post("api/auth/notif", controller.SendNotification)
+	app.Get("api/user/notif/:id", controller.GetNotifs)
+
+
+
+
+	//Notifs SSE
+
+
+
+
 
 }
 

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 
@@ -312,7 +314,7 @@ func LikePosts(c *fiber.Ctx) error{
 	}
 
 	err = database.DBConn.Take(&post, "id = ?", ids.PostID).Error
-
+	
 	if err != nil{
 		context["err"]= err.Error()
 		log.Println(err.Error())
@@ -322,9 +324,6 @@ func LikePosts(c *fiber.Ctx) error{
 
 	err = database.DBConn.Model(&post).Association("LikedByUser").Find(&user, "id = ?", ids.UserID)
 
-
-
-	
 
 	if err != nil{
 		context["err"]= err.Error()
@@ -353,7 +352,6 @@ func LikePosts(c *fiber.Ctx) error{
 	
 	
 		context["result ganteng"] = user
-	log.Println("ganteng")
 		return c.Status(200).JSON(context)
 	}
 
@@ -380,8 +378,70 @@ func LikePosts(c *fiber.Ctx) error{
 		c.Status(503).JSON(context)
 	}
 
+	//Send Notifications
+
+
+	notification:= []model.Notification{}
+
+	err = database.DBConn.Find(&notification, "message @> ?", map[string]interface{}{"post_id": ids.PostID, "sender_id": ids.UserID, "reciever_id": post.UserID}).Error
+
+
+	if err != nil{
+		context["err"]= err.Error()
+		log.Println(err.Error())
+		c.Status(503).JSON(context)
+	}
+	log.Println("ini notif", notification, len(notification))
+
+	if len(notification) > 0 {
+
+		return c.Status(200).JSON(context)
+	}
+
+
+	
+	type like struct{
+		SenderID uuid.UUID		`json:"sender_id"`
+		RecieverID uuid.UUID	`json:"reciever_id"` 
+		MessageNotif string		`json:"message"`
+		PostTitle	string 		`json:"post_title"`
+		PostID   uint    		`json:"post_id"`
+	}
+
+	likeNotif :=like{
+		SenderID: ids.UserID,
+		RecieverID: post.UserID,
+		PostTitle: post.Judul,
+		MessageNotif: "User like your post!",
+		PostID: ids.PostID,
+	}
+
+	res, _ := json.Marshal(&likeNotif)
+
+	fmt.Println("\nUsing Marshal:\n" + string(res))
+
+
+	notif := model.Notification{
+		UserID: post.UserID,
+		Dibaca: false,
+		Type: "like",
+		Message: res,
+	}
+
+	result := database.DBConn.Create(&notif)
+
+	if result.Error != nil{
+		log.Println("Error menyimpan di dalam database")
+		context["err"] = result.Error.Error()
+		return c.Status(400).JSON(context)
+	}
+
+
+
 	// context["data"] = post
 	context["user"] = user
+	context["notif"] = notif
+
 
 	return c.Status(200).JSON(context)
 }

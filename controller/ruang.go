@@ -148,7 +148,7 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 		context["err"] = err
 		return c.Status(500).JSON(context)
 	}
-	errRuang:= database.DBConn.Take(&user, "id = ?", "ec69e8d7-9ed6-4032-a42a-f5c0f1e917c4").Error
+	errRuang:= database.DBConn.Take(&user, "id = ?", "25def23f-a327-4c9a-92b8-aa5ef8b0a0c2").Error
 
 	if errRuang !=nil{
 		context["err"] = err

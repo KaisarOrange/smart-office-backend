@@ -49,5 +49,5 @@ func main() {
 
 	router.Routes(app)
 	// log.Fatal(app.ListenTLS("192.168.100.35:8080", "./127.0.0.1.pem", "./127.0.0.1-key.pem"))
-	app.Listen("192.168.100.35:8080")
+	app.Listen("127.0.0.1:8080")
 }
