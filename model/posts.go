@@ -21,6 +21,7 @@ type Posts struct {
 	Private		bool				`json:"private" gorm:"default:false"`		
 	Comment 	Comment				`json:"comment" gorm:"constraint:OnDelete:CASCADE"` 
 	LikedByUser []User				`json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:posts_id;references:id;joinReferences:user_id"`						  
+	Reminder	Reminder			`json:"reminder" gorm:"foreignKey:posts_id"`			
 }
 
 type PostResponse struct{

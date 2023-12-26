@@ -63,6 +63,44 @@ func GetPosts(c *fiber.Ctx) error{
 	return c.Status(201).JSON(context)
 }
 
+func GetPost(c *fiber.Ctx) error{
+	db := database.DBConn
+
+	context:= fiber.Map{
+		"status": "Get Post",
+	}
+
+	posts := model.Posts{}
+
+	err:= db.Take(&posts, c.Params("id")).Error
+	
+	
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
+	}
+
+	userId := posts.UserID.String()
+
+	fmt.Println("ini strign: ", userId)
+
+	err = db.Preload("Comment").Preload("User").Preload("LikedByUser", "id = ?" , userId).Take(&posts,"id = ?", c.Params("id")).Error
+  
+	if err !=nil{
+		log.Println(err.Error())
+		context["err"]= err.Error()
+		c.Status(503).JSON(context)
+	
+	}
+
+	context["data"] = posts
+
+	return c.Status(201).JSON(context)
+}
+
+
+
 func GetPostsDraft(c *fiber.Ctx) error{
 	db := database.DBConn
 
@@ -398,7 +436,6 @@ func LikePosts(c *fiber.Ctx) error{
 		return c.Status(200).JSON(context)
 	}
 
-
 	
 	type like struct{
 		SenderID uuid.UUID		`json:"sender_id"`
@@ -406,6 +443,7 @@ func LikePosts(c *fiber.Ctx) error{
 		MessageNotif string		`json:"message"`
 		PostTitle	string 		`json:"post_title"`
 		PostID   uint    		`json:"post_id"`
+		RuangID   uuid.UUID    	`json:"ruang_id"`
 	}
 
 	likeNotif :=like{
@@ -414,12 +452,10 @@ func LikePosts(c *fiber.Ctx) error{
 		PostTitle: post.Judul,
 		MessageNotif: "User like your post!",
 		PostID: ids.PostID,
+		RuangID: post.RuangID,
 	}
 
 	res, _ := json.Marshal(&likeNotif)
-
-	fmt.Println("\nUsing Marshal:\n" + string(res))
-
 
 	notif := model.Notification{
 		UserID: post.UserID,

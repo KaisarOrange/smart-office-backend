@@ -15,6 +15,7 @@ func Routes(app *fiber.App){
 
 
 	app.Get("api/posts/:id", controller.GetPosts)
+	app.Get("api/post/:id", controller.GetPost)
 	app.Get("api/posts/:id/draft", controller.GetPostsDraft)
 	app.Get("api/posts/:id/like", controller.GetLikePosts)
 	app.Post("api/posts", controller.CreatePost, controller.CreateComment)
@@ -42,6 +43,13 @@ func Routes(app *fiber.App){
 
 	app.Post("api/auth/notif", controller.SendNotification)
 	app.Get("api/user/notif/:id", controller.GetNotifs)
+	app.Post("api/user/notif/mention", controller.SendMentionNotif)
+
+	app.Put("api/user/reminder", controller.SetReminder)
+
+
+	
+
 
 
 

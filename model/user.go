@@ -18,6 +18,7 @@ type User struct {
 	Ruang []Ruang `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
 	LikePosts	[]Posts `json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:posts_id"`
 	Notification []Notification `json:"notification"`
+	Reminders	[]Reminder `json:"reminders" gorm:"many2many:users_reminder;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:reminder_id"`
 }
 
 
@@ -33,6 +34,8 @@ type UserResponse struct{
 	Ruang 		[]RuangRespone `json:"ruang" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:ruang_id"`
 	LikePosts	[]Posts `json:"user_like" gorm:"many2many:user_like_posts;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:posts_id"`
 	Notification []Notification `json:"notification" gorm:"foreignKey:user_id;references:id"`
+	Reminders	[]Reminder `json:"reminders" gorm:"many2many:users_reminder;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:reminder_id"`
+
 }
 
 //Types for get All post

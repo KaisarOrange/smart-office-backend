@@ -7,6 +7,7 @@ type Ruang struct {
 	Name		string `json:"name" gorm:"not null"`
 	RuangImgURL string `json:"ruang_img_url" gorm:"type:text"`
 	Posts		[]Posts  `json:"posts"`
+	Reminders	[]Reminder  `json:"reminders"`
 	UserID		uuid.UUID `json:"user_id" form:"user_id" gorm:"-"`
 	Users 		[]UserResponse `json:"user" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
 }
