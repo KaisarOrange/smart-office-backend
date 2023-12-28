@@ -16,5 +16,4 @@ type Reminder struct {
 	RuangID			uuid.UUID `json:"ruang_id"`
 	PostsID          uint	`json:"post_id"`
 	ReminderUsers   []User	`json:"reminders" gorm:"many2many:users_reminder;foreignKey:id;joinForeignKey:reminder_id;references:id;joinReferences:user_id"`					
-
 }
