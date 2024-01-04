@@ -1,9 +1,15 @@
 package router
 
 import (
+	"time"
+
+	w "github.com/KaisarOrange/smart-office/pkg/webrtc"
+
 	"github.com/KaisarOrange/smart-office/controller"
+	"github.com/KaisarOrange/smart-office/webrtc"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 )
 
 func Routes(app *fiber.App){
@@ -52,14 +58,40 @@ func Routes(app *fiber.App){
 
 
 
+//WEBRTC
 
+	app.Get("/", webrtc.Welcome)
+	app.Get("/room/create", webrtc.RoomCreate)
+	app.Get("/room/:uuid", webrtc.Room)
+	app.Get("/room/:uuid/websocket", websocket.New(webrtc.RoomWebsocket, websocket.Config{
+		HandshakeTimeout: 10 * time.Second,
+	}))
+	// app.Get("/room/:uuid/chat", webrtc.RoomChat)
+	// app.Get("/room/:uuid/chat/websocket", websocket.New(webrtc.RoomChatWebsocket))
+	app.Get("/room/:uuid/viewer/websocket", websocket.New(webrtc.RoomViewerWebsocket))
+	app.Get("/stream/:suuid", webrtc.Stream)
+	app.Get("/stream/:suuid/websocket", websocket.New(webrtc.StreamWebsocket, websocket.Config{
+		HandshakeTimeout: 10 * time.Second,
+	}))
+	// app.Get("/stream/:suuid/chat/websocket", websocket.New(webrtc.StreamChatWebsocket))
+	app.Get("/stream/:suuid/viewer/websocket", websocket.New(webrtc.StreamViewerWebsocket))
+	// app.Static("/", "./assets")
+
+	w.Rooms = make(map[string]*w.Room)
+	w.Streams = make(map[string]*w.Room)
+	go dispatchKeyFrames()
 
 	//Notifs SSE
 
 
-
-
-
 }
+func dispatchKeyFrames() {
+	for range time.NewTicker(time.Second * 3).C {
+		for _, room := range w.Rooms {
+			room.Peers.DispatchKeyFrame()
+		}
+	}
+}
+
 
 
