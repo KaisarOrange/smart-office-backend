@@ -39,7 +39,7 @@ func GetUser(c *fiber.Ctx) error{
 
 	var user model.UserResponse
 
-	err:=database.DBConn.Preload("Posts", func(db *gorm.DB) *gorm.DB{
+	err:=database.DBConn.Preload("Reminders").Preload("Posts", func(db *gorm.DB) *gorm.DB{
 		return db.Order("created_at desc")
 	}).Preload("Posts.User").Preload("Posts.Ruang").Preload("Posts.Comment").Preload("Posts.LikedByUser").Preload("Ruang", "id <> ?", c.Params("id")).Order("created_at desc").Find(&user, "id = ?", c.Params("id")).Error
 

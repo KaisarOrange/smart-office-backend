@@ -13,7 +13,6 @@ import (
 func SetReminder(c *fiber.Ctx) error {
 	reminder := new(model.Reminder)
 
-
 	type ReqReminder struct{
 	Title         string    `json:"title"`
     CompletedTask int       `json:"completed_task"`
@@ -25,7 +24,6 @@ func SetReminder(c *fiber.Ctx) error {
 	}
 
 	var req ReqReminder
-
 
 	err:= c.BodyParser(&req)
 	if err!=nil{
@@ -43,6 +41,7 @@ func SetReminder(c *fiber.Ctx) error {
 	reminder.Title = req.Title
 	reminder.TotalTask = req.TotalTask
 	reminder.PostsID = req.PostsID
+	reminder.DueTime = req.DueTime
 
 	err = database.DBConn.Save(reminder).Error
 
@@ -68,14 +67,16 @@ func SetReminder(c *fiber.Ctx) error {
 		log.Println("hehehehehe", user)
 
 
-		err = database.DBConn.Model(&reminder).Association("ReminderUsers").Append(&user)
+		// err = database.DBConn.Model(&user).Association("Reminders").Append(&reminder)
+		err = database.DBConn.Table("users_reminder").Create(map[string]interface{}{
+			"user_id": user.ID,
+			"reminder_id":reminder.ID,
+		}).Error
 
 		if err != nil{	
 			log.Println("hehe: ", err.Error())
 			c.Status(503).JSON(fiber.Map{"err":err.Error()})
 		}
-
-
 	}
 
 	return c.Status(200).JSON(fiber.Map{"data":reminder})

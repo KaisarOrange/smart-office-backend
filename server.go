@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
+	"github.com/KaisarOrange/smart-office/chat"
 	"github.com/KaisarOrange/smart-office/database"
 	"github.com/KaisarOrange/smart-office/router"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -34,9 +34,7 @@ func main() {
 
 	app := fiber.New()
 	
-	app.Use(logger.New())
-
-
+	// app.Use(logger.New())
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://192.168.100.35:5173, http://localhost:5173",
@@ -45,9 +43,26 @@ func main() {
 	}))
 
 
+	//
 
+	// app.Use(func(c *fiber.Ctx) error {
+	// 	if websocket.IsWebSocketUpgrade(c) { // Returns true if the client requested upgrade to the WebSocket protocol
+	// 		return c.Next()
+	// 	}
+	// 	return c.SendStatus(fiber.StatusUpgradeRequired)
+	// })
 
+	go chat.RunHub()
+
+	
+
+	// flag.Parse()
+	//
 	router.Routes(app)
+	chat.Routes(app)
+
+
 	// log.Fatal(app.ListenTLS("192.168.100.35:8080", "./127.0.0.1.pem", "./127.0.0.1-key.pem"))
 	app.Listen("127.0.0.1:8080")
 }
+
