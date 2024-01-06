@@ -18,6 +18,7 @@ type RuangRespone struct{
 	RuangImgURL string `json:"ruang_img_url" gorm:"type:text"`
 	Posts		[]Posts  `json:"posts" gorm:"foreignKey:ruang_id;references:id"`
 	UserID		uuid.UUID `json:"-" form:"user_id"`
+	Reminders	[]Reminder  `json:"reminders" gorm:"foreignKey:ruang_id;references:id"`
 	Users 		[]UserResponse `json:"user" gorm:"many2many:anggota;foreignKey:id;joinForeignKey:ruang_id;References:id;joinReferences:user_id"`
 }
 

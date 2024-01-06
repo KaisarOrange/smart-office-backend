@@ -35,13 +35,23 @@ func SetReminder(c *fiber.Ctx) error {
 	if err!=nil{
 		c.Status(fiber.ErrBadRequest.Code).JSON(err.Error())
 	}
+	log.Println(req)
+	err = database.DBConn.Take(&reminder, "posts_id = ?", req.PostsID).Error
 
+	if err!=nil{
+		c.Status(fiber.ErrBadRequest.Code).JSON(err.Error())
+	}
 	reminder.CompletedTask = req.CompletedTask
-	reminder.RuangID = ruangUUID
 	reminder.Title = req.Title
 	reminder.TotalTask = req.TotalTask
 	reminder.PostsID = req.PostsID
-	reminder.DueTime = req.DueTime
+
+	if reminder.ID == 0{
+		reminder.DueTime = req.DueTime
+		reminder.RuangID = ruangUUID
+	}
+
+
 
 	err = database.DBConn.Save(reminder).Error
 

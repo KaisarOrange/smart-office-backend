@@ -121,7 +121,7 @@ func GetRuang(c *fiber.Ctx) error{
 
 	err:= database.DBConn.Preload("Posts" ,"draft <> true AND private <> true", func(db *gorm.DB) *gorm.DB{
 		return db.Order("created_at desc")
-	}).Preload("Posts.Ruang").Preload("Posts.User").Preload("Posts.LikedByUser").Preload("Users").Preload("Posts.Comment").First(&ruang, "id = ?",c.Params("id")).Error
+	}).Preload("Posts.Ruang").Preload("Posts.User").Preload("Posts.LikedByUser").Preload("Users").Preload("Reminders").Preload("Posts.Comment").First(&ruang, "id = ?",c.Params("id")).Error
 
 	if err !=nil{
 		context["error_message"] = err.Error();

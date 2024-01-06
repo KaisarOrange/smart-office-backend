@@ -41,6 +41,7 @@ func Routes(app *fiber.App){
 	app.Put("api/ruangupdate", controller.InsertUserIntoRuang)
 
 
+
 	app.Get("api/auth/restricted", jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte("rahasia")},	
 	}),controller.Restricted)
