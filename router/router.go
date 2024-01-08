@@ -24,6 +24,7 @@ func Routes(app *fiber.App){
 	app.Get("api/post/:id", controller.GetPost)
 	app.Get("api/posts/:id/draft", controller.GetPostsDraft)
 	app.Get("api/posts/:id/like", controller.GetLikePosts)
+	app.Get("api/post/:id/:postId/allow", controller.IsUserAllowedToEdit)
 	app.Post("api/posts", controller.CreatePost, controller.CreateComment)
 	app.Post("api/posts/private", controller.CreatePost)
 	app.Put("api/posts", controller.UpdatePost)
@@ -38,7 +39,7 @@ func Routes(app *fiber.App){
 	app.Get("api/ruang", controller.GetRuangs)
 	app.Get("api/ruang/:id", controller.GetRuang)
 	app.Post("api/ruang", controller.CreateRuang)
-	app.Put("api/ruangupdate", controller.InsertUserIntoRuang)
+	app.Put("api/ruangupdate/:ruang/:user", controller.InsertUserIntoRuang)
 
 
 

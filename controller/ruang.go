@@ -143,14 +143,14 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 	var ruang model.RuangRespone
 	var user model.UserResponse
 
-	err:= database.DBConn.Take(&ruang, "id = ?", "00693064-0e3d-4e28-b90c-34604325d541").Error
+	err:= database.DBConn.Take(&ruang, "id = ?", c.Params("ruang")).Error
 	if err !=nil{
 		context["err"] = err
 		return c.Status(500).JSON(context)
 	}
-	errRuang:= database.DBConn.Take(&user, "id = ?", "25def23f-a327-4c9a-92b8-aa5ef8b0a0c2").Error
+	err = database.DBConn.Take(&user, "user_name = ?", c.Params("user")).Error
 
-	if errRuang !=nil{
+	if err !=nil{
 		context["err"] = err
 		return c.Status(500).JSON(context)
 	}
@@ -166,6 +166,7 @@ func InsertUserIntoRuang(c *fiber.Ctx) error{
 
 		return c.Status(500).JSON(context)
 	}
+	log.Println("okkkkkkkk")
 
 	context["data"] = ruang
 

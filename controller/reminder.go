@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func SetReminder(c *fiber.Ctx) error {
+func SetReminder(c *fiber.Ctx) error { 
 	reminder := new(model.Reminder)
 
 	type ReqReminder struct{

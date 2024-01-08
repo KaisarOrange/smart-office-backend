@@ -537,3 +537,22 @@ func GetLikePosts(c *fiber.Ctx) error{
 
 	return c.Status(201).JSON(context)
 }
+
+func IsUserAllowedToEdit(c *fiber.Ctx) error{
+
+post := new(model.Posts)
+
+err:= database.DBConn.Preload("Reminder.ReminderUsers", "id", c.Params("id")).Take(&post, c.Params("postId")).Error
+
+
+if err!=nil{
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"err":err.Error()})
+}
+
+if len(post.Reminder.ReminderUsers) > 0{
+	return c.Status(200).JSON(fiber.Map{"message":"is user allowed to edit", "data":true})
+
+}else{
+	return c.Status(200).JSON(fiber.Map{"message":"is user allowed to edit", "data":false})
+}
+}
